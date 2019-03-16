@@ -8,7 +8,8 @@ import {
   InputItem,
   WhiteSpace,
   Button,
-  Toast
+  Toast,
+  Modal
 } from 'antd-mobile'
 
 export const App = () => {
@@ -30,7 +31,7 @@ export const App = () => {
     error: errList.includes(key),
     onBlur: val => {
       if (val === '') setErrList(errList.concat(key))
-      setBasicInfo({...basicInfo, [key]: val})
+      setBasicInfo({ ...basicInfo, [key]: val })
     },
     onChange: val => {
       if (val !== '') setErrList(removeEle(errList, key))
@@ -45,31 +46,31 @@ export const App = () => {
           renderHeader={() => '请填写您的报名信息'}
         >
           <InputItem
-          maxLength={8}
-          error={errList.includes('team')}
-          {...inputVerifi('team')}
+            maxLength={8}
+            error={errList.includes('team')}
+            {...inputVerifi('team')}
           >队伍名称</InputItem>
           <InputItem
-          maxLength={12}
-          {...inputVerifi('captain')}
+            maxLength={12}
+            {...inputVerifi('captain')}
           >队长姓名</InputItem>
           <InputItem
-          type="number"
-          maxLength={10}
-          {...inputVerifi('stuid')}
+            type="number"
+            maxLength={10}
+            {...inputVerifi('stuid')}
           >队长学号</InputItem>
           <InputItem
-          type="phone"
-          {...inputVerifi('phone')}
+            type="number"
+            {...inputVerifi('phone')}
           >联系电话</InputItem>
           <InputItem
-          maxLength={14}
-          {...inputVerifi('college')}
+            maxLength={14}
+            {...inputVerifi('college')}
           >学院</InputItem>
           <InputItem
-          maxLength={12}
-          {...inputVerifi('teacher')}
-          onFocus={() => setErrList(removeEle(errList, 'default'))}
+            maxLength={12}
+            {...inputVerifi('teacher')}
+            onFocus={() => setErrList(removeEle(errList, 'default'))}
           >指导老师</InputItem>
         </List>
         <List
@@ -82,38 +83,43 @@ export const App = () => {
           </WingBlank>
           <WhiteSpace />
           {
-            playerList.map((e, i) => 
+            playerList.map((e, i) =>
               <InputItem
-              key={i}
-              type="number"
-              maxLength={10}
-              error={errList.includes(`stu${i}`)}
-              onBlur={val => {
-                if (val === '') setErrList(errList.concat(`stu${i}`))
-                let list = [...playerList]
-                list[i] = val
-                setPlayerList(list)
-              }}
-              onChange={val => {
-                if (val !== '') setErrList(removeEle(errList, `stu${i}`))
-              }}
+                key={i}
+                type="number"
+                maxLength={10}
+                error={errList.includes(`stu${i}`)}
+                onBlur={val => {
+                  if (val === '') setErrList(errList.concat(`stu${i}`))
+                  let list = [...playerList]
+                  list[i] = val
+                  setPlayerList(list)
+                }}
+                onChange={val => {
+                  if (val !== '') setErrList(removeEle(errList, `stu${i}`))
+                }}
               >
-              学号{i + 1}
+                学号{i + 1}
               </InputItem>
             )
           }
         </List>
         <WhiteSpace size="xl"></WhiteSpace>
         <WingBlank size="lg">
-        <Button
-          type="primary"
-          disabled={Object.keys(basicInfo).length !== 6}
-          onClick={() => {
-            if (errList.length !== 0 || playerList.includes('')) Toast.fail('未填完报名信息')
-          }}
-        >提交</Button>
+          <Button
+            type="primary"
+            onClick={() => {
+              if (
+                errList.length !== 0
+                || playerList.includes('')
+                || Object.keys(basicInfo).length !== 6
+              ) { return Toast.fail('未填完报名信息') }
+              Modal.alert('报名成功！')
+              console.log({...basicInfo, stuids: playerList})
+            }}
+          >提交</Button>
         </WingBlank>
-        <WhiteSpace size="lg"/>
+        <WhiteSpace size="lg" />
       </WingBlank>
     </>
   )
