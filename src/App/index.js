@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
+import { enroll } from '../api'
 import { removeEle } from '../utils'
-import './index.scss'
 import {
   NavBar,
   List,
@@ -16,6 +16,7 @@ export const App = () => {
   const [playerList, setPlayerList] = useState([])
   const [basicInfo, setBasicInfo] = useState({})
   const [errList, setErrList] = useState(['default'])
+  const [loading, setLoading] = useState(false)
 
   const addPlayer = () => {
     if (playerList.length >= 4) return Toast.fail('最多可添加4名队员', 1.5)
@@ -92,7 +93,7 @@ export const App = () => {
                 onBlur={val => {
                   if (val === '') setErrList(errList.concat(`stu${i}`))
                   let list = [...playerList]
-                  list[i] = val
+                  list[i] = +val
                   setPlayerList(list)
                 }}
                 onChange={val => {
@@ -108,14 +109,41 @@ export const App = () => {
         <WingBlank size="lg">
           <Button
             type="primary"
+            loading={loading}
             onClick={() => {
               if (
                 errList.length !== 0
                 || playerList.includes('')
                 || Object.keys(basicInfo).length !== 6
               ) { return Toast.fail('未填完报名信息') }
-              Modal.alert('报名成功！')
-              console.log({...basicInfo, stuids: playerList})
+              setLoading(true)
+              let list = JSON.stringify(playerList)
+              let data = {...basicInfo, stuids: list}
+              enroll(data)
+              .then(res => {
+                setLoading(false)
+                let status = res.data.status
+                switch (status) {
+                  case 403:
+                    Modal.alert('输入的队伍名称或学号或联系方式长度不对')
+                    break
+                  case 202:
+                    Modal.alert('您已经报过名了')
+                    break
+                  case 400:
+                    Modal.alert('报名失败！')
+                    break
+                  case 200:
+                    Modal.alert('报名成功！')
+                    break
+                  default:
+                    Modal.alert('报名失败！')
+                }
+              })
+              .catch(err => {
+                setLoading(false)
+                Modal.alert('报名失败！')
+              })
             }}
           >提交</Button>
         </WingBlank>
