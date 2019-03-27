@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Result } from './Result'
 import { enroll } from '../api'
 import { removeEle } from '../utils'
 import {
@@ -17,9 +18,10 @@ export const App = () => {
   const [basicInfo, setBasicInfo] = useState({})
   const [errList, setErrList] = useState(['default'])
   const [loading, setLoading] = useState(false)
+  const [showResult, setShowResult] = useState(false)
 
   const addPlayer = () => {
-    if (playerList.length >= 4) return Toast.fail('最多可添加4名队员', 1.5)
+    if (playerList.length >= 3) return Toast.fail('最多可添加3名队员', 1.5)
     setPlayerList(playerList.concat(''))
   }
   const deletePlayer = () => {
@@ -41,7 +43,8 @@ export const App = () => {
 
   return (
     <>
-      <NavBar>比赛报名系统</NavBar>
+      <NavBar>第二届电子设计创新挑战赛</NavBar>
+      <WhiteSpace size="md" />
       <WingBlank>
         <List
           renderHeader={() => '请填写您的报名信息'}
@@ -51,10 +54,10 @@ export const App = () => {
             error={errList.includes('team')}
             {...inputVerifi('team')}
           >队伍名称</InputItem>
-          <InputItem
+          {/* <InputItem
             maxLength={12}
             {...inputVerifi('captain')}
-          >队长姓名</InputItem>
+          >队长姓名</InputItem> */}
           <InputItem
             type="number"
             maxLength={10}
@@ -64,10 +67,10 @@ export const App = () => {
             type="number"
             {...inputVerifi('phone')}
           >联系电话</InputItem>
-          <InputItem
+          {/* <InputItem
             maxLength={14}
             {...inputVerifi('college')}
-          >学院</InputItem>
+          >学院</InputItem> */}
           <InputItem
             maxLength={12}
             {...inputVerifi('teacher')}
@@ -75,7 +78,7 @@ export const App = () => {
           >指导老师</InputItem>
         </List>
         <List
-          renderHeader={() => '请添加1-4名队员的学号'}
+          renderHeader={() => '请添加0-3名队员的学号'}
         >
           <WingBlank>
             <WhiteSpace />
@@ -114,7 +117,7 @@ export const App = () => {
               if (
                 errList.length !== 0
                 || playerList.includes('')
-                || Object.keys(basicInfo).length !== 6
+                || Object.keys(basicInfo).length !== 4
               ) { return Toast.fail('未填完报名信息') }
               setLoading(true)
               let list = JSON.stringify(playerList)
@@ -128,13 +131,14 @@ export const App = () => {
                     Modal.alert('输入的队伍名称或学号或联系方式长度不对')
                     break
                   case 202:
-                    Modal.alert('您已经报过名了')
+                    Modal.alert('您或您的队友已经报过名了')
                     break
                   case 400:
                     Modal.alert('报名失败！')
                     break
                   case 200:
                     Modal.alert('报名成功！')
+                    setShowResult(true)
                     break
                   default:
                     Modal.alert('报名失败！')
@@ -148,7 +152,9 @@ export const App = () => {
           >提交</Button>
         </WingBlank>
         <WhiteSpace size="lg" />
+        <p style={{textAlign: 'center', color: '#6b6767'}}>©红岩网校工作站</p>
       </WingBlank>
+      {showResult && <Result />}
     </>
   )
 }
