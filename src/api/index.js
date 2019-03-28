@@ -1,7 +1,7 @@
 import axios from 'axios'
 import Qs from 'qs'
 
-const baseURL = `http://111.230.169.17:8080/match`
+const baseURL = `https://wx.idsbllp.cn/match/`
 
 export const enroll = data =>
   axios({
